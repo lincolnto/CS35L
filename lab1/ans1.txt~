@@ -1,0 +1,5 @@
+1. man -k [WORD]
+I searched through "man man" and tested the command on lnxsrv to
+confirm its operation.
+
+2. 

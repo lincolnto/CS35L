@@ -1,0 +1,20 @@
+1. man -k [WORD]
+I searched through "man man" and tested the command on lnxsrv to
+confirm its operation.
+
+2. mv: /usr/bin/mv	sh: /usr/bin/sh
+I used the commands "which mv" and "which sh" to find these
+
+3. Programs: tr, ar, pr
+/usr/bin/tr:
+Translate or delete characters
+
+/usr/bin/ar:
+Create, modify, and extract from archives
+
+/usr/bin/pr:
+Convert text files for printing
+
+I used "find /usr/bin -name "?r" -executable" to locate the above programs, and then used whatis on each program to identify what they do
+
+4.
