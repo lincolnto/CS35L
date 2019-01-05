@@ -1,0 +1,126 @@
+/*
+ *  Lincoln To
+ *  104 441 725
+ *  Assignment 9
+ *  CS 35L Lab 5
+ *  hw9.txt
+ */
+
+1. Start in diffutils-patched/ directory on the master branch
+	$ git checkout master
+
+2. Check out version 3.0 into a new branch named "quote"
+	$ git checkout -b "quote" "v3.0"
+
+3. Install change into the new branch
+	$ patch -p1 < ../quote-3.0-patch.txt
+
+4. Learn how to use Emacs function add-change-log-entry-other-window (C-x 4 a)
+	The command adds a new entry to the changelog for the file being
+	edited.
+
+5. Use emacs to compose ChangeLog entry, adapted from original patch
+	Get the original patch changelog entry
+	$ emacs ../git-log.txt
+
+	Found the original changelog entry using C-s and searching the
+	commit number
+
+	I simply opened up one of the files src/cmp.c, then pasted the
+	relevant changelog entries from git-log.txt into this changelog.
+
+6. Commit your changes to the new branch, using the changelog entry
+   as the commit message
+
+   $ git add *
+   $ git commit -F ChangeLog
+
+7. Use the command git format-patch to generate formatted-patch.txt
+
+	First, find the commit using git log
+	$ git log
+	Which gives us the following commit:
+	e016afe932674132fe5355c4bda18fc41e4cb59c
+
+	Generate the patch
+	$ git format-patch -1 e016afe932674132fe5355c4bda18fc41e4cb59c --stdout > ../formatted-patch.txt
+
+	Test the patch in a new branch
+	$ git checkout "v3.0"
+	$ patch -p1 < ../formatted-patch.txt
+	patching file src/cmp.c
+	patching file src/diff.c
+	patching file src/diff3.c
+	patching file src/dir.c
+	patching file src/sdiff.c
+	patching file src/util.c
+
+	$ ./bootstrap
+	$ patch -p1 < ../diffutils-gets.diff
+	$ ./configure
+	$ make
+	$ make check
+
+	Verify the patched version behaves correctly
+	$ ./src/diff . -
+	diff: cannot compare '-' to a directory
+	$ ./src/diff --help
+
+	Both of these use the apostrophe instead of `, so the patch works
+
+
+8. Verify that your partner's patch works
+	
+	My partner was Anthony Lei from Lab Section 8.
+
+	Create the new branch, then apply their patch
+	$ git checkout -b "partner" "v3.0"
+	$ git am < ../Lei_formatted-patch.txt
+	Applying: 2018-12-06 Anthony Yu Jun Lei <classyei@lnxsrv06.seas.ucla.edu>
+	.git/rebase-apply/patch:48: trailing whitespace.
+	        * src/cmp.c: I fixed the error and changed ` to '
+	.git/rebase-apply/patch:64: trailing whitespace.
+
+	.git/rebase-apply/patch:85: trailing whitespace.
+
+	.git/rebase-apply/patch:88: space before tab in indent.
+	         || (e == LONGINT_INVALID_SUFFIX_CHAR && **argptr == delimiter))
+	.git/rebase-apply/patch:96: space before tab in indent.
+	          _("SKIP values may be followed by the following multiplicative suffixes:\n\
+	warning: squelched 156 whitespace errors
+	warning: 161 lines add whitespace errors.
+
+	$ ./bootstrap
+	$ patch -p1 < ../diffutils-gets.diff
+	$ ./configure
+	$ make
+	$ make check
+
+	Verify the patched version behaves correctly
+	$ ./src/diff . -
+	diff: cannot compare `-' to a directory
+	$ ./src/diff --help
+
+	My partner's patches did not seem to work properly, as the grave accent is still present.
+
+9. Verify that your ChangeLog entry works using make distdir and
+   inspecting the resulting diffutils*/ChangeLog file
+   	$ git checkout "quote"
+	$ make distdir
+
+	This generated a new directory diffutils-3.0.1-e016
+	$ cd diffutils-3.0.1-e016
+	$ emacs ChangeLog
+
+	With this, I verified that the ChangeLog entry worked properly.
+
+10. Run gitk on GNU Emacs git repository master branch
+	Start a new SSH session with X-forwarding enabled
+
+	$ ssh -X lincoln@lnxsrv.seas.ucla.edu
+	$ cd ~eggert/src/gnu/emacs
+	$ gitk
+
+	From there, I typed "Merge" into the Find box to highlight any 
+	entries with Merge in them. The screenshot can be seen in 
+	gitk-screenshot.png

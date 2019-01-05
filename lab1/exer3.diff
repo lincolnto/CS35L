@@ -1,0 +1,24 @@
+6,7c6,7
+< <meta http-equiv='Content-Type' content='text/html;charset=UTF-8'>
+< <title>Assignment 1. Getting to know your system</title>
+---
+> <meta http-equiv='Content-Type' content='text/html;charset=US-ASCII'>
+> <title>Assignment 42. Getting to know your system</title>
+12c12
+< <h1>Assignment 1. Getting to know your system</h1>
+---
+> <h1>Assignment 42. Getting to know your system</h1>
+18c18
+< <!-- diff，在UNIX系統上的一個工具程式，它可以比較兩個檔案之間的不同。通常它被用來比較同一個檔案，在不同版本間的差異。它可以產生一個擴展名為.diff或.patch的檔案，這個檔案可以被另一個工具程式patch來使用。-->
+---
+> <!-- diffUNIX.diff.patchpatch-->
+122a123
+> 
+211c212
+< <li>Change the first instance of "UTF-8" to "US-ASCII".</li>
+---
+> <li>Change the first instance of "US-ASCII" to "US-ASCII".</li>
+243c244
+< <li>&hellip; except we didn't really want to do that, so undo the deletion.</li>
+---
+> <li>&hellip; except we didn't really wa<nt to do that, so undo the deletion.</li>

@@ -1,0 +1,41 @@
+/*
+ *  Lincoln To
+ *  104 441 725
+ *  Assignment 6
+ *  CS 35L Lab 5
+ */
+
+1. Check sort version
+$ sort --version
+sort (GNU coreutils) 8.30
+
+2. Generate random file containing 2^24 random floats
+$ od -An -t fF -N $((2**24)) < /dev/urandom | tr -s [:blank:] '\n' | sed '/^$/d' > sortme.txt
+
+3. Time the sort command
+$ time -p sort -g sortme.txt > /dev/null
+real 10.01
+user 50.88
+sys 0.22
+
+$ time -p sort -g --parallel=1 sortme.txt > /dev/null
+real 44.48
+user 44.31
+sys 0.15
+
+$ time -p sort -g --parallel=2 sortme.txt > /dev/null
+real 21.95
+user 41.33
+sys 0.34
+
+$ time -p sort -g --parallel=4 sortme.txt > /dev/null
+real 12.93
+user 43.11
+sys 0.29
+
+$ time -p sort -g --parallel=8 sortme.txt > /dev/null
+real 9.82
+user 54.59
+sys 0.25
+
+As we can see, increasing the number of threads decreases the real time used to sort the file.

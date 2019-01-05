@@ -1,0 +1,118 @@
+/*
+ *  Lincoln To
+ *  104 441 725
+ *  Assignment 8
+ *  CS 35L Lab 5
+ */
+
+I was unable to work with a teammate locally due to personal circumstances that prevented
+me from being in LA during this week, so I utilized two BeagleBones and two different laptops
+to perform the lab on my own. All steps were repeated across both devices.
+
+I used one BeagleBone on Mac OSX Mojave, and the other on Ubuntu 18.04 LTS.
+
+1. Setup BeagleBone
+	The BeagleBone was first setup using the instructions on Piazza. Drivers were installed
+	on Mac OSX.
+
+	$ sudo ssh root@192.168.7.2
+
+	To enable wifi, the following were used when ssh-ed into the BeagleBone
+	# sudo connmanctl
+	connmanctl> enable wifi
+	connmanctl> scan wifi
+	connmanctl> services
+	connmanctl> agent on
+	connmanctl> connect wifi_2cf7f10697a2_45636b7320446565_managed_psk
+	connmanctl> quit
+
+2. Find the IP address of the Beaglebone
+	# ifconfig
+	My IP Address: 192.168.1.26 (Mac OSX)
+	Teammate's IP: 192.168.1.31 (Ubuntu)
+
+3. Update apt-get database and install xauth, xvfb, Firefox
+	# sudo apt-get update
+	# sudo apt-get install xauth
+	# sudo apt-get install xvfb
+	# sudo apt-get install firefox-esr-l10n-en-gb
+
+4. Check X11 Forwarding configuration
+	# cd /etc/ssh
+	I used emacs to check both ssh_config and sshd_config to confirm that X11 forwarding
+	was activated.
+
+5. Install OpenSSH
+	# sudo apt-get install openssh-server
+	# sudo apt-get install openssh-client
+
+6. Start establishing trusted connections using OpenSSH
+
+	I began by utilizing my Mac machine as the client and Ubuntu machine as the server.
+	On both machines:
+		Generate RSA key pairs
+
+		# ssh-keygen
+
+
+	On the Ubuntu machine (server):
+		Create account for client (Mac) with username:password as ltmac:ltmac
+
+		# sudo useradd -d /home/ltmac/ -m ltmac
+		# sudo passwd ltmac
+
+		Configure the account and directory to store RSA keys
+
+		# cd /home/ltmac
+		# sudo mkdir .ssh
+		# sudo chown -R ltmac .ssh
+		# sudo chmod 700 .ssh
+
+	On the Mac machine (client):
+		Connect to the server
+
+		# ssh ltmac@192.168.1.31
+
+		This confirms that the account was setup properly. allowing me to connect through ssh.
+
+	Next, we need to use ssh-agent to manage authentication. Again, using my Mac as the client:
+	On the Mac machine (client):
+		Copy SSH key to the server
+
+		# ssh-copy-id -i ltmac@192.168.1.31
+		# eval `ssh-agent -s`
+		# ssh-add
+		# ssh ltmac@192.168.1.31
+
+		After copying my client's RSA key to the server and attempting to SSH, it did not 
+		prompt me for a password, indicating that password-less login was setup correctly.
+
+		Try to test X11 forwarding
+		# ssh -X ltmac@192.168.1.31
+		# firefox
+		# xterm
+		
+	I had issues getting X11 port forwarding to work, but after confirming XQuartz was 
+	installed and restarting my Mac, it worked with no issues. Additionally, repeating
+	with ssh -Y did not yield any significant differences in behavior.
+
+7. Repeat for the Ubuntu machine as the client just as extra practice
+	On the Mac machine (server):
+		Create and configure account for client (Ubuntu) with user:pw as ltubu:ltubu
+		
+		# sudo useradd -d /home/ltubu/ -m ltubu
+		# sudo passwd ltubu
+		# cd /home/ltubu
+		# sudo mkdir .ssh
+		# sudo chown -R ltubu .ssh
+		# sudo chmod 700 .ssh
+
+	On the Ubuntu machine (client):
+		Copy keys and connect to the server
+
+		# ssh-copy-id -i ltmac@192.168.1.26
+		# ssh ltubu@192.168.1.26
+
+	This all proceeded similarly to the previous part using the Mac as the client and
+	Ubuntu machine as the server. 
+

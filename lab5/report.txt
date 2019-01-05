@@ -1,0 +1,205 @@
+/*
+ *  Lincoln To
+ *  104 441 725
+ *  Assignment 5
+ *  CS 35L Lab 5
+ */
+
+/* lab.txt */
+
+1. Write tr2b.c
+   Check submitted file for actual code.
+
+2. Write tr2u.c
+   Check submitted file for actual code.
+
+   Both sources are nearly identical except for the usage of getchar/putchar vs. read/write.
+
+   Logically, the programs start by doing basic error checking as defined in the assignment. First, it checks to ensure
+   that only two operands are inputted to the program, then ensures that both string operands are of the same length. 
+
+   If no errors are found, then the program will check the first operand, "char * from", to see if there are any duplicate
+   bytes in the c-string. This is done by using an array of bools, essentially working as a hash table, with the hash
+   function being the conversion of a char to its associated int value in ASCII encoding. For each char found in from, the
+   associated value in the foundChars array will be marked true. If a char is marked true twice in the foundChars array,
+   then there is a duplicate value and the program will exit with an error.
+
+   From there, the transliteration begins by processing all input from stdin one byte at a time. The byte is compared to
+   all chars in the from string to see if it needs to be transliterated. If a match is found, the value with the
+   corresponding index in the to string will be written to stdout, thus transliterating the byte.
+
+3. Use strace to compare system calls from both tr2b and tr2u
+   First, I created a file called test.txt which is over 5MB. This was done manually in emacs, and with a combination
+   of cat commands to append the file to itself until the file was over 5MB.
+
+a. Copying one file to another
+   I used wc -l, which prints out the newline counts for a file, to estimate the amount of system calls that each
+   program uses.
+
+   $ strace -o strace_tr2b ./tr2b abc xyz < testfile > tr2b_out.txt
+   $ wc -l strace_tr2b
+   1516 strace_tr2b
+   This gives us 1516 lines, so approximately 1516 syscalls
+
+   $ strace -o strace_tr2u ./tr2u abc xyz < testfile > tr2u_out.txt
+   $ wc -l strace_tr2u
+   12165915 strace_tr2u
+
+b. Copying a file to terminal
+ 
+   $ strace -o strace_tr2b1 ./tr2b abc xyz < testfile
+   $ wc -l strace_tr2b1
+   131590 strace_tr2b1
+   This gives us 131590 lines, so approximately 131590 syscalls.
+  
+   $ strace -o strace_tr2u1 ./tr2u abc xyz < testfile
+   $ wc -l strace_tr2u1
+   10676643 strace_tr2u1
+   This gives us 10676643 lines, so approximately 10676643 syscalls.
+
+4. Use the time command to compare how much faster one program is from another 
+   $ time ./tr2b abc xyz < testfile
+   real	0m1.046s
+   user	0m0.296s
+   sys	0m0.173s
+
+   $ time ./tr2u abc xyz < testfile
+   real	0m11.066s
+   user	0m1.540s
+   sys	0m9.511s
+
+   When outputting to the terminal, my implementation of tr2u takes approximately 11x the amount of time that my 
+   implementation of tr2b does.
+
+   $ time ./tr2b abc xyz < testfile > tr2b_out.txt
+   real	0m0.307s
+   user	0m0.212s
+   sys	0m0.010s
+
+   $ time ./tr2u abc xyz < testfile > tr2u_out.txt
+   real	0m11.839s
+   user	0m1.481s
+   sys	0m10.276s
+
+   When outputting to a file, my implementation of tr2u takes approximately 38x the amount of time that my
+   implementation of tr2b does. Additionally, When outputting to the terminal, my implementation of tr2b takes approx.
+   3.4x the amount of time that tr2b does when outputting to a file.
+
+   As expected, using buffered IO (getchar and putchar) is significantly faster than unbuffered IO, as the number of 
+   syscalls with buffered IO is reduced when compared to unbuffered IO. Additionally, outputting to the terminal
+   (i.e. stdout) is slightly slower than outputting to a file.
+
+/* Homework Results */
+I created 4 files, test_sml.txt, test_med,txt, test_lrg.txt, and test_verylrg.txt to test each version of sfrob. The files 
+contain 1 line, 100 lines, 1000 lines and 10000 lines respectively to test the performance of each version of sfrob. These 
+test files contain the string provided in assignment 4 to test the output of sfrob.
+Test String: "*~BO *{_CIA *hXE]D *LER #@_GZY #E\\OX #^BO #FKPS #NEM\4"
+
+1. sfrob performance
+$ time ./sfrob < test_sml.txt
+real  0m0.003s
+user  0m0.000s
+sys   0m0.002s
+
+$ time ./sfrob < test_med.txt
+real  0m0.003s
+user  0m0.001s
+sys   0m0.001s
+
+$ time ./sfrob < test_lrg.txt
+real  0m0.016s
+user  0m0.012s
+sys   0m0.001s
+
+$ time ./sfrob < test_verylrg.txt
+real  0m0.141s
+user  0m0.110s
+sys   0m0.017s
+
+2. sfrobu performance
+$ time ./sfrobu < test_sml.txt
+real  0m0.002s
+user  0m0.000s
+sys   0m0.002s
+
+$ time ./sfrobu < test_med.txt
+real  0m0.008s
+user  0m0.002s
+sys   0m0.004s
+
+$ time ./sfrobu < test_lrg.txt
+real  0m0.052s
+user  0m0.016s
+sys   0m0.034s
+
+$ time ./sfrobu < test_verylrg.txt
+real  0m0.519s
+user  0m0.172s
+sys   0m0.335s
+
+$ time ./sfrobu -f < test_sml.txt
+real  0m0.002s
+user  0m0.001s
+sys   0m0.000s
+
+$ time ./sfrobu -f < test_med.txt
+real  0m0.007s
+user  0m0.001s
+sys   0m0.005s
+
+$ time ./sfrobu -f < test_lrg.txt
+real  0m0.055s
+user  0m0.013s
+sys   0m0.040s
+
+$ time ./sfrobu -f < test_verylrg.txt
+real  0m0.552s
+user  0m0.189s
+sys   0m0.351s
+
+3. sfrobs performance
+$ time ./sfrobs < test_sml.txt
+real  0m0.007s
+user  0m0.001s
+sys   0m0.008s
+
+$ time ./sfrobs < test_med.txt
+real  0m0.009s
+user  0m0.002s
+sys   0m0.008s
+
+$ time ./sfrobs < test_lrg.txt
+real  0m0.012s
+user  0m0.004s
+sys   0m0.009s
+
+$ time ./sfrobs < test_verylrg.txt
+real  0m0.051s
+user  0m0.030s
+sys   0m0.020s
+
+$ time ./sfrobs -f < test_sml.txt
+real  0m0.006s
+user  0m0.003s
+sys   0m0.006s
+
+$ time ./sfrobs -f < test_med.txt
+real  0m0.009s
+user  0m0.006s
+sys   0m0.004s
+
+$ time ./sfrobs -f < test_lrg.txt
+real  0m0.011s
+user  0m0.004s
+sys   0m0.010s
+
+$ time ./sfrobs -f < test_verylrg.txt
+real  0m0.065s
+user  0m0.046s
+sys   0m0.017s
+
+From these results, we can see that the fastest performing version of sfrob is sfrobs, which uses standard tr and sort.
+This is followed by sfrob, which uses buffered IO. The slowest of the three is sfrobu, which uses unbuffered IO. 
+Additionally, using the -f option on both sfrobu and sfrobs decreases performance slightly. In sfrobu, the time taken
+to run the program with the -f option is 106% the time taken without the option. In sfrobs, it is 127%. These comparisons
+were made using the times given while using test_verylrg.txt as input.

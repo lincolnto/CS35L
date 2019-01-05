@@ -1,0 +1,23 @@
+/*
+ *  Lincoln To
+ *  104 441 725
+ *  Assignment 9
+ *  CS 35L Lab 5
+ *  gitk-description.txt
+ */
+
+Top Left Pane:
+	Shows a series of commits to the repository, as well as the
+	branches and any merges that have occurred.
+
+Top Middle/Right Pane:
+	These panes show the person and email of the person who performed
+	the commit, as well as the date and time at which this event 
+	occurred.
+
+Bottom Left Pane:
+	This shows the commit details, and you can select various views
+	in order to see the full diff, the old version, or the new version.
+
+Bottom Right Pane: 
+	This pane shows the list of files impacted by the selected commit

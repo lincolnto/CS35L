@@ -1,0 +1,6 @@
+from argparse import ArgumentParser
+parser = ArgumentParser()
+parser.add_argument("filename", action="store", nargs='?', default="")
+parser.add_argument("-i", "--input-range", action="store", nargs=1, dest="input_range", help="""treat each number LO through HI as an input line""")
+parser.add_argument("-n", "--head-count", action="store", dest="count", help="output at most COUNT lines")
+options = p.parse_args("-i 1-10".split())

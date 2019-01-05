@@ -1,0 +1,69 @@
+1. Download the Coreutils 8.29 source code compressed tarball, signature, and
+keyring
+$ wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz
+$ wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz.sig
+$ wget https://ftp.gnu.org/gnu/gnu-keyring.gpg
+
+Verify signature
+$ gpg --verify --keyring ./gnu-keyring.gpg coreutils-8.29.tar.xz.sig
+
+Gave output 
+gpg: Signature made Wed 27 Dec 2017 10:29:05 AM PST using RSA key ID 306037D9
+gpg: /u/ms/ugrad/lincoln/.gnupg/trustdb.gpg: trustdb created
+gpg: Good signature from "Pádraig Brady <P@draigBrady.com>"
+gpg:                 aka "Pádraig Brady <pbrady@redhat.com>"
+gpg:                 aka "Pádraig Brady <pixelbeat@gnu.org>"
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: 6C37 DC12 121A 5006 BC1D  B804 DF6F D971 3060 37D9
+
+2. 
+Decompress the Coreutils 8.29 source
+$ tar -xvf coreutils-8.29.tar.xz
+
+Configure the source for installation
+$ ./configure --prefix /u/ms/ugrad/lincoln/cs35l/lab3/coreutilsInstall
+
+Compile coreutils and then install
+$ make && make install
+
+3.
+Reproduce the bug using coreutils' version of ls 
+
+Running from ~/cs35l/lab3/coreutils/bin, test ls, ls -a, ls -A, ls -aA
+
+$ ./ls
+Outputs expected results, same as ls
+
+$ ./ls -a
+Outputs expected results, same as ls -a. Includes the "." and ".." in output
+
+$ ./ls -A
+Outputs expected results, same as ls -A. Excludes "." and ".." in output
+
+$ ./ls -aA
+Bug can be seen here. Output includes "." and "..", while "$ ls -aA" does not
+
+4.
+Apply the patch.
+
+Copy and paste the patch for Bug#30963 Message #10 into a file called
+patch.diff in the coreutils-8.29 directory
+$ cd ~/cs35l/lab3/coreutils-8.29
+$ emacs patch.diff
+
+Apply the patch $ patch < patch.diff
+
+5.
+Rebuild the fixed version, then install 
+$ make
+$ make install
+
+6.
+Confirm the bug is fixed
+
+$ ./ls -aA
+Outputs the same thing as "$ ls -aA", so the bug is fixed
+
+$ ./ls -Aa
+Displays both "." and "..", so a overrides A and the bug is fixed.

@@ -1,0 +1,250 @@
+/*
+ *  Lincoln To
+ *  104 441 725
+ *  Assignment 4
+ *  CS 35L Lab 5
+ */
+
+1. Download and configure source
+$ wget https://web.cs.ucla.edu/classes/fall18/cs35L/assign/
+coreutils-with-bug.tar.gz
+$ tar -xzvf coreutils-with-bug.tar.gz
+$ cd coreutils-with-bug/
+$ ./configure --prefix /u/ms/ugrad/lincoln/cs35l/lab4/coreutils
+
+2. Build source
+$ make
+
+Outputs error:
+In file included from utimecmp.c:41:
+utimens.h:2:5: error: conflicting types for 'futimens'
+ int futimens (int, char const *, struct timespec const [2]);
+     ^~~~~~~~
+In file included from utimecmp.h:25,
+                 from utimecmp.c:25:
+/usr/include/sys/stat.h:373:12: note: previous declaration of 'futimens' was 
+here
+ extern int futimens (int __fd, const struct timespec __times[2]) __THROW;
+            ^~~~~~~~
+
+As the error states, futimens has conflicting types for in two different places
+
+3. Get and apply patch
+$ wget https://web.cs.ucla.edu/classes/fall18/cs35L/assign/coreutils.diff
+
+$ emacs coreutils.diff
+The patch has a '~' at the end of each file name, so edit in emacs to remove 
+the ~ before applying the patch.
+
+$ patch -p0 < coreutils.diff
+Patch applied successfully.
+The patch fixes the error by renaming the function futimens shown above to 
+coreutils_futimens, fixing any errors.
+
+4. Try to build again
+$ make -j30
+$ make install
+The version of coreutils is installed in ~/cs35l/lab4/coreutils
+
+5. Reproduce the bug
+
+a. Confirm that the bug exists
+Use the code given on the assignment page to confirm the bug exists. I made a
+script to make life easier.
+============================== reproduce_bug.sh ===============================
+#!/bin/bash
+
+tmp=$(mktemp -d)
+cd $tmp
+touch -d '1918-11-11 11:00 GMT' wwi-armistice
+touch now
+sleep 1
+touch now1
+TZ=UTC0 ~/cs35l/lab4/coreutils/bin/ls -lt --full-time wwi-armistice now now1
+cd ~/cs35l/lab4/
+rm -rf $tmp
+===============================================================================
+
+$ chmod +x reproduce_bug.sh
+$ ./reproduce_bug.sh
+-rw-r--r-- 1 lincoln msugrad 0 1918-11-11 11:00:00.000000000 +0000 
+wwi-armistice
+-rw-r--r-- 1 lincoln msugrad 0 2018-11-04 08:06:14.868040197 +0000 now1
+-rw-r--r-- 1 lincoln msugrad 0 2018-11-04 08:06:13.863006345 +0000 now
+
+As we can see, the bug exists.
+
+b. Use GDB to find the bug
+$ cd $tmp
+$ gdb ~/cs35l/lab4/coreutils/bin/ls
+(gdb) run -lt ./wwi-armistice ./now ./now1
+Starting program: /w/home.03/ms/ugrad/lincoln/cs35l/lab4/coreutils/bin/ls -lt 
+./wwi-armistice ./now ./now1
+-rw-r--r-- 1 lincoln msugrad 0 1918-11-11 03:00 ./wwi-armistice
+-rw-r--r-- 1 lincoln msugrad 0 2018-11-04 01:14 ./now1
+-rw-r--r-- 1 lincoln msugrad 0 2018-11-04 01:14 ./now
+[Inferior 1 (process 12703) exited normally]
+
+If we take a look at the ls manual, the -t flag sorts by modification time. 
+Let's look for something similar in gdb...
+
+(gdb) info functions
+
+We have a function called sort_files, as well as various rev_cmp or rev_str 
+functions that seem to have something to do with time. Let's set a breakpoint 
+at sort_files to start, and step through the function to see what happens
+
+(gdb) break sort_files
+(gdb) run -lt ./wwi-armistice ./now ./now1
+2962      if (! setjmp (failed_strcoll))
+2964          switch (sort_type)
+2969              switch (time_type)
+2975                  func = sort_reverse ? rev_cmp_mtime : compare_mtime;
+3034      qsort (files, files_index, sizeof *files, func);
+(gdb) info locals
+func = 0x4070a0 <compare_mtime>
+(gdb) s
+main (argc=5, argv=0x7fffffffe278) at ls.c:1260
+
+We see that func equals compare_mtime, so we can take a look at what this does.
+
+(gdb) break compare_mtime
+(gdb) run -lt ./wwi-armistice ./now ./now1
+Breakpoint 2, compare_mtime (a=0x618190, b=0x618240) at ls.c:2884
+2884    static int compare_mtime (V a, V b) { return cmp_mtime (a, b, 
+xstrcoll); }
+cmp_mtime (cmp=0x4045d0 <xstrcoll>, b=0x618240, a=0x618190) at ls.c:2884
+2884    static int compare_mtime (V a, V b) { return cmp_mtime (a, b, 
+xstrcoll); }
+timespec_cmp (b=..., a=...) at ../lib/timespec.h:48
+48        int diff = a.tv_sec - b.tv_sec;
+49        return diff ? diff : a.tv_nsec - b.tv_nsec;
+(gdb) info locals
+diff = 4
+diff = <optimized out>
+(gdb) c
+Breakpoint 2, compare_mtime (a=0x6180e0, b=0x618240) at ls.c:2884
+2884    static int compare_mtime (V a, V b) { return cmp_mtime (a, b, 
+xstrcoll); }
+cmp_mtime (cmp=0x4045d0 <xstrcoll>, b=0x618240, a=0x6180e0) at ls.c:2884
+2884    static int compare_mtime (V a, V b) { return cmp_mtime (a, b, 
+xstrcoll); }
+timespec_cmp (b=..., a=...) at ../lib/timespec.h:48
+48        int diff = a.tv_sec - b.tv_sec;
+49        return diff ? diff : a.tv_nsec - b.tv_nsec;
+(gdb) info locals
+diff = -1139822044
+diff = <optimized out>
+
+We see that compare_mtime is called twice, before the program completes. 
+Additionally, we took a look at the local variables, showing that diff=4 during
+the first call, and diff=-1139822044 during the second call, indicating that we
+might have some sort of overflow.
+
+We also notice that cmp_mtime is used, and looking at the ls.c source, it 
+returns a value for diff, which is given by calling timespec_cmp. Let's look
+at this function next.
+
+(gdb) break timespec_cmp
+(gdb) run -lt ./wwi-armistice ./now ./now1
+
+Breakpoint 5, timespec_cmp (b=..., a=...) at ../lib/timespec.h:48
+48        int diff = a.tv_sec - b.tv_sec;
+(gdb) s
+49        return diff ? diff : a.tv_nsec - b.tv_nsec;
+(gdb) info locals
+diff = 4
+diff = <optimized out>
+(gdb) s
+0x00007ffff7a46ae3 in msort_with_tmp.part () from /lib64/libc.so.6
+(gdb) s
+Single stepping until exit from function msort_with_tmp.part.0,
+which has no line number information.
+0x00007ffff7aa27e0 in __memcpy_sse2 () from /lib64/libc.so.6
+(gdb) s
+Single stepping until exit from function __memcpy_sse2,
+which has no line number information.
+0x00007ffff7a46a58 in msort_with_tmp.part () from /lib64/libc.so.6
+(gdb) s
+Single stepping until exit from function msort_with_tmp.part.0,
+which has no line number information.
+
+Breakpoint 5, timespec_cmp (b=..., a=...) at ../lib/timespec.h:48
+48        int diff = a.tv_sec - b.tv_sec;
+(gdb) s
+49        return diff ? diff : a.tv_nsec - b.tv_nsec;
+(gdb) list
+44         Assume the nanosecond components are in range, or close to it.  */
+45      static inline int
+46      timespec_cmp (struct timespec a, struct timespec b)
+47      {
+48        int diff = a.tv_sec - b.tv_sec;
+49        return diff ? diff : a.tv_nsec - b.tv_nsec;
+50      }
+51
+52      # if ! HAVE_DECL_NANOSLEEP
+53      /* Don't specify a prototype here.  Some systems (e.g., OSF) declare
+(gdb) info locals
+diff = -1139822044
+diff = <optimized out>
+(gdb) s
+0x00007ffff7a46ae3 in msort_with_tmp.part () from /lib64/libc.so.6
+(gdb) s
+Single stepping until exit from function msort_with_tmp.part.0,
+which has no line number information.
+0x00007ffff7aa27e0 in __memcpy_sse2 () from /lib64/libc.so.6
+(gdb) s
+Single stepping until exit from function __memcpy_sse2,
+which has no line number information.
+0x00007ffff7a46e37 in qsort_r () from /lib64/libc.so.6
+(gdb) s
+Single stepping until exit from function qsort_r,
+which has no line number information.
+-rw-r--r-- 1 lincoln msugrad 0 1918-11-11 03:00 ./wwi-armistice
+-rw-r--r-- 1 lincoln msugrad 0 2018-11-04 01:14 ./now1
+-rw-r--r-- 1 lincoln msugrad 0 2018-11-04 01:14 ./now
+[Inferior 1 (process 15501) exited normally]
+
+Now we know that there is some issue with how timespec_cmp in timespec.h 
+determines the value of diff. Since there is some kind of overflow, we can fix
+this.
+
+6. Fix the bug
+Make a copy of timespec.h, and edit
+$ cd ~/cs35l/lab4/coreutils-with-bug/lib
+$ cp timespec.h ~/cs35l/lab4/timespec.h
+$ cd ../..
+$ emacs timespec.h
+$ diff -u coreutils-with-bug/lib/timespec.h timespec.h > coreutils-with-bug/
+lab4.diff
+
+You can see the patch in the included lab4.diff in the submission. Additionally
+we copied the changelog using C-x 4 a to the diff file in emacs.
+
+$ make
+$ make install
+
+Test to confirm that the bug is fixed.
+
+$ ./reproduce_bug.sh
+-rw-r--r-- 1 lincoln msugrad 0 2018-11-04 09:36:01.247235267 +0000 now1
+-rw-r--r-- 1 lincoln msugrad 0 2018-11-04 09:36:00.242201543 +0000 now
+-rw-r--r-- 1 lincoln msugrad 0 1918-11-11 11:00:00.000000000 +0000 
+wwi-armistice
+
+The bug is fixed!
+
+7. Test the SEASNet machine
+
+$ cd ~
+$ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+$ touch now
+$ touch now1
+$ TZ=UTC0 ls -lt --full-time wwi-armistice now now1
+-rw-r--r-- 1 lincoln msugrad 0 2054-12-17 17:28:16.000000000 +0000 
+wwi-armistice
+-rw-r--r-- 1 lincoln msugrad 0 2018-11-04 09:40:08.371744000 +0000 now1
+-rw-r--r-- 1 lincoln msugrad 0 2018-11-04 09:40:07.058691000 +0000 now
+
+SEASNet seems to have a similar bug, but now wwi-armistice gives a date with
+the year 2054, indicating that it seems to be unable to handle very old dates.

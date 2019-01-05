@@ -1,11 +1,14 @@
-1. man -k [WORD]
-I searched through "man man" and tested the command on lnxsrv to
+1.
+ man -k [WORD]
+I searched through "$ man man" and tested the command on lnxsrv to
 confirm its operation.
 
-2. mv: /usr/bin/mv	sh: /usr/bin/sh
-I used the commands "which mv" and "which sh" to find these
+2.
+ mv: /usr/bin/mv	sh: /usr/bin/sh
+I used the commands "$ which mv" and "$ which sh" to find these
 
-3. Programs: tr, ar, pr
+3.
+ Programs: tr, ar, pr
 /usr/bin/tr:
 Translate or delete characters
 
@@ -15,6 +18,340 @@ Create, modify, and extract from archives
 /usr/bin/pr:
 Convert text files for printing
 
-I used "find /usr/bin -name "?r" -executable" to locate the above programs, and then used whatis on each program to identify what they do
+I used "$ find /usr/bin -name "?r" -executable" to locate the above programs, and then used whatis on each program to identify what they do
 
 4.
+ /etc/alternatives/emacs
+I used "$ readlink emacs" to find the location of this symbolic link
+
+5.
+ /usr/bin/gcc is version 4.8.5
+Plain gcc is version 8.2.0
+I used "$ /usr/bin/gcc --version" and "$ gcc --version" to find this answer. This is useful if you want to use certain gcc options/flags that are not available in other versions of gcc
+
+6.
+ The command adds execute permissions and sets user or group ID upon execution for a user, and removes write permissions from others.
+I used "$ man chmod" to get this answer
+
+7.
+ Too many directories to list here.
+I used "$ find /usr/local/cs -type d -mtime -28" to search for any directories modified in the last 28 days. Using "-maxdepth 1" would allow searching for only directories directly under /usr/local/cs.
+
+8.
+ /usr/bin/pmiostat
+/usr/bin/xzfgrep
+/usr/bin/updmap
+/usr/bin/systemd-coredumpctl
+/usr/bin/rpmquery
+/usr/bin/links
+/usr/bin/rmic
+/usr/bin/jarsigner
+/usr/bin/parec
+/usr/bin/nc
+/usr/bin/inimf
+/usr/bin/gimp
+/usr/bin/pnmtofits
+/usr/bin/bunzip2
+/usr/bin/arecord
+/usr/bin/el5-rpmlint
+/usr/bin/ppmtouil
+/usr/bin/lastb
+/usr/bin/gnroff
+/usr/bin/unxz
+/usr/bin/systemd-loginctl
+/usr/bin/flex++
+/usr/bin/javadoc
+/usr/bin/paplay
+/usr/bin/pack200
+/usr/bin/slogin
+/usr/bin/python2-config
+/usr/bin/pnmtopnm
+/usr/bin/rpmverify
+/usr/bin/kdesu
+/usr/bin/dviluatex
+/usr/bin/jjs
+/usr/bin/X
+/usr/bin/javap
+/usr/bin/gnatgcc
+/usr/bin/gtroff
+/usr/bin/atq
+/usr/bin/jadetex
+/usr/bin/texhash
+/usr/bin/unix2mac
+/usr/bin/texluac
+/usr/bin/zsoelim
+/usr/bin/pstack
+/usr/bin/vimdiff
+/usr/bin/tclsh
+/usr/bin/psfaddtable
+/usr/bin/servertool
+/usr/bin/gemtopbm
+/usr/bin/ebb
+/usr/bin/psfgettable
+/usr/bin/bzcat
+/usr/bin/pnmcomp
+/usr/bin/sgmlnorm
+/usr/bin/pdfetex
+/usr/bin/appletviewer
+/usr/bin/spent
+/usr/bin/el4-rpmlint
+/usr/bin/gimp-console
+/usr/bin/pnmenlarge
+/usr/bin/dvi2fax
+/usr/bin/wish
+/usr/bin/combinediff
+/usr/bin/kpsepath
+/usr/bin/flipdiff
+/usr/bin/jstat
+/usr/bin/htmex
+/usr/bin/apropos
+/usr/bin/latrace-ctl
+/usr/bin/pnmtotiff
+/usr/bin/icontopbm
+/usr/bin/byacc
+/usr/bin/passwd
+/usr/bin/httex
+/usr/bin/rvi
+/usr/bin/htcontext
+/usr/bin/jmap
+/usr/bin/db2rtf
+/usr/bin/nisdomainname
+/usr/bin/gpgv
+/usr/bin/pdflatex
+/usr/bin/linux32
+/usr/bin/schemagen
+/usr/bin/psfstriptable
+/usr/bin/rksh
+/usr/bin/dvired
+/usr/bin/ppmquantall
+/usr/bin/mail
+/usr/bin/mac2unix
+/usr/bin/dvipdfm
+/usr/bin/Mail
+/usr/bin/pdfxmltex
+/usr/bin/pdfjadetex
+/usr/bin/pnmdepth
+/usr/bin/fmtutil
+/usr/bin/rnano
+/usr/bin/parecord
+/usr/bin/rhn_register
+/usr/bin/xzcmp
+/usr/bin/gnome-keyring
+/usr/bin/allneeded
+/usr/bin/lz4cat
+/usr/bin/bzless
+/usr/bin/db2ps
+/usr/bin/ksh
+/usr/bin/mptopdf
+/usr/bin/pnmscale
+/usr/bin/db2dvi
+/usr/bin/fmtutil-sys
+/usr/bin/open
+/usr/bin/latex
+/usr/bin/jps
+/usr/bin/setup-nsssysinit
+/usr/bin/lex
+/usr/bin/pmatop
+/usr/bin/lp
+/usr/bin/ht
+/usr/bin/texlua
+/usr/bin/pnmnoraw
+/usr/bin/policyeditor
+/usr/bin/kpsexpand
+/usr/bin/bashbug
+/usr/bin/sh
+/usr/bin/pgmedge
+/usr/bin/phar
+/usr/bin/extractbb
+/usr/bin/traceroute6
+/usr/bin/ypdomainname
+/usr/bin/grepdiff
+/usr/bin/jstatd
+/usr/bin/htxelatex
+/usr/bin/newaliases.postfix
+/usr/bin/i386
+/usr/bin/dvigif
+/usr/bin/pnmarith
+/usr/bin/xzcat
+/usr/bin/rmiregistry
+/usr/bin/pstree.x11
+/usr/bin/python2
+/usr/bin/dvdrecord
+/usr/bin/kpsewhere
+/usr/bin/newaliases
+/usr/bin/sgml2xml
+/usr/bin/pgmnorm
+/usr/bin/mktexfmt
+/usr/bin/python
+/usr/bin/pamrgbatopng
+/usr/bin/etags
+/usr/bin/linux64
+/usr/bin/pax
+/usr/bin/unpack200
+/usr/bin/iptables-xml
+/usr/bin/nmtui-edit
+/usr/bin/ppmtojpeg
+/usr/bin/dvilualatex
+/usr/bin/setup
+/usr/bin/gsoelim
+/usr/bin/cdrecord
+/usr/bin/reset
+/usr/bin/jar
+/usr/bin/ping6
+/usr/bin/htxetex
+/usr/bin/texconfig-sys
+/usr/bin/cancel
+/usr/bin/jade
+/usr/bin/jstack
+/usr/bin/nail
+/usr/bin/orbd
+/usr/bin/nmtui-connect
+/usr/bin/db2pdf
+/usr/bin/texconfig
+/usr/bin/wsgen
+/usr/bin/pgmoil
+/usr/bin/updmap-sys
+/usr/bin/itweb-settings
+/usr/bin/pbmtoicon
+/usr/bin/emacs
+/usr/bin/lpr
+/usr/bin/xmltex
+/usr/bin/pngtopnm
+/usr/bin/allcm
+/usr/bin/desktop-file-edit
+/usr/bin/jrunscript
+/usr/bin/mkisofs
+/usr/bin/pmevent
+/usr/bin/allec
+/usr/bin/jhat
+/usr/bin/cc
+/usr/bin/xjc
+/usr/bin/atrm
+/usr/bin/etex
+/usr/bin/spam
+/usr/bin/htlatex
+/usr/bin/awk
+/usr/bin/lpstat
+/usr/bin/ghostscript
+/usr/bin/rmid
+/usr/bin/rmail
+/usr/bin/ex
+/usr/bin/lsdiff
+/usr/bin/jconsole
+/usr/bin/texlinks
+/usr/bin/csh
+/usr/bin/domainname
+/usr/bin/hwloc-ls
+/usr/bin/rview
+/usr/bin/gpic
+/usr/bin/lprm
+/usr/bin/subscription-manager
+/usr/bin/extcheck
+/usr/bin/ppmtotga
+/usr/bin/x86_64
+/usr/bin/sg
+/usr/bin/pnmfile
+/usr/bin/pnminterp
+/usr/bin/lualatex
+/usr/bin/mk4ht
+/usr/bin/f95
+/usr/bin/mkluatexfontdb
+/usr/bin/mkhybrid
+/usr/bin/gneqn
+/usr/bin/initex
+/usr/bin/mysql_config
+/usr/bin/serialver
+/usr/bin/gpg
+/usr/bin/keytool
+/usr/bin/jdb
+/usr/bin/pcp2csv
+/usr/bin/captoinfo
+/usr/bin/policytool
+/usr/bin/thumbpdf
+/usr/bin/pmcollectl
+/usr/bin/java
+/usr/bin/f2py.numpy
+/usr/bin/native2ascii
+/usr/bin/gtar
+/usr/bin/ld
+/usr/bin/pnmsplit
+/usr/bin/kpsetool
+/usr/bin/dnsdomainname
+/usr/bin/bzcmp
+/usr/bin/jsadebugd
+/usr/bin/javaws
+/usr/bin/infotocap
+/usr/bin/simpdftex
+/usr/bin/nmtui-hostname
+/usr/bin/gtbl
+/usr/bin/xzegrep
+/usr/bin/view
+/usr/bin/rvim
+/usr/bin/python-config
+/usr/bin/makeinfo
+/usr/bin/ControlPanel
+/usr/bin/jinfo
+/usr/bin/unlz4
+/usr/bin/nsgmls
+/usr/bin/jdeps
+/usr/bin/readcd
+/usr/bin/nfs4_editfacl
+/usr/bin/javac
+/usr/bin/pgmslice
+/usr/bin/httexi
+/usr/bin/gjs
+/usr/bin/bmptoppm
+/usr/bin/tnameserv
+/usr/bin/pamon
+/usr/bin/wsimport
+/usr/bin/mailq
+/usr/bin/texconfig-dialog
+/usr/bin/libpng-config
+/usr/bin/gmake
+/usr/bin/javah
+/usr/bin/lpq
+/usr/bin/idlj
+/usr/bin/chsh
+/usr/bin/jcmd
+/usr/bin/pnmcut
+/usr/bin/geqn
+/usr/bin/ppmnorm
+/usr/bin/mailq.postfix
+
+I used "$ whereis find" to find the path of find and then used "$ find /usr/bin/ -type l" to return all files which are symbolic links. This gave 278 files.
+
+9. 
+librom1394.so.0.3.0
+I used the following commands:
+"$ cd /usr/lib64/"
+"$ ls -alt"
+
+10. 
+The locale command gets its data from localedef
+I found this using "$ man locale" and "$ man localedef"
+
+11.
+C-h a downcase
+dired-downcase
+downcase-region
+downcase-word
+
+12. 
+C-h k C-M-r
+C-M-r runs the command isearch-backward-regexp
+
+C-h k C-M-v
+C-M-v runs the command scroll-other-window
+
+13.
+C-h k C-g
+C-g runs the command keyboard-quit which is an interactive compiled Lisp function in 'simple.el'. 
+
+14.
+C-h f yank
+Yank reinserts or pastes "the last stretch of killed text. It is bound to C-y
+
+15.
+I used C-h f dired and C-x 4 d to get help on dired and see how it is used.
+I also used man ls and ls -l for the same reason.
+Dired shows hidden files as well, and opens the directory listings in an emacs buffer rather than a shell window.

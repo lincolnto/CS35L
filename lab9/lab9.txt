@@ -1,0 +1,243 @@
+/*
+ *  Lincoln To
+ *  104 441 725
+ *  Assignment 9
+ *  CS 35L Lab 5
+ *  lab9.txt
+ */
+
+1. Get a copy of the Diffutils repository
+	$ git clone ~eggert/src/gnu/diffutils
+
+2. Get a log of changes using git log
+	$ cd diffutils
+	$ git log > ../git-log.txt
+
+3. Get a list of tags using git tag
+	$ git tag > ../git-tags.txt
+
+4. Find the commit titled "maint: quote 'like this'..."
+	$ cd ..
+	$ emacs git-log.txt
+
+	I used the search functionality 'C-s' to find the commit, which was commit 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f
+	To generate the patch:
+	$ git format-patch -1 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f --stdout > ../quote-patch.txt
+
+5. Checkout v3.0 of Diffutils
+	$ git checkout -b "local3.0" "v3.0"
+
+6. Patch quote-patch.txt to version 3.0
+	$ patch -p1 < ../quote-patch.txt
+
+	Problems:
+		Could not find the following files:
+			diffutils.texi
+			HACKING
+			help2man
+		Hunks failed:
+			README:			Hunks 09, 60
+			README-hacking:	Hunks 01
+			cfg.mk:			Hunks 01
+			src/diff.c: 	Hunks 10, 11, 12
+			src/diff3.c: 	Hunks 06
+
+7. Use git status to get overview of what happened
+	$ git status
+	On branch local3.0
+	Changes not staged for commit:
+	  (use "git add <file>..." to update what will be committed)
+	  (use "git checkout -- <file>..." to discard changes in working 
+	  directory)
+
+		modified:   NEWS
+		modified:   README
+		modified:   TODO
+		modified:   doc/diagmeet.note
+		modified:   ms/config.bat
+		modified:   ms/config.site
+		modified:   po/en.po
+		modified:   src/analyze.c
+		modified:   src/cmp.c
+		modified:   src/context.c
+		modified:   src/diff.c
+		modified:   src/diff.h
+		modified:   src/diff3.c
+		modified:   src/dir.c
+		modified:   src/ifdef.c
+		modified:   src/io.c
+		modified:   src/sdiff.c
+		modified:   src/side.c
+		modified:   src/system.h
+		modified:   src/util.c
+		modified:   tests/help-version
+
+	Untracked files:
+	  (use "git add <file>..." to include in what will be committed)
+
+		NEWS.orig
+		README-hacking.orig
+		README-hacking.rej
+		README.orig
+		README.rej
+		cfg.mk.orig
+		cfg.mk.rej
+		ms/config.site.orig
+		quote-patch.txt
+		src/cmp.c.orig
+		src/context.c.orig
+		src/diff.c.orig
+		src/diff.c.rej
+		src/diff.h.orig
+		src/diff3.c.orig
+		src/diff3.c.rej
+		src/dir.c.orig
+		src/sdiff.c.orig
+		src/system.h.orig
+		src/util.c.orig
+		tests/help-version.orig
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+8. Learn how to use Emacs functions vc-diff (C-x v =) and vc-revert 
+(C-x v u) as well as the functions diff-apply-hunk (C-c C-a) and 
+diff-goto-source (C-c C-c) Use describe-mode (C-h m) to look at the 
+diff functions
+
+   Briefly, changes in a patch are grouped into hunks or "contiguous
+   chunks of text that contain one or more changed lines". Each hunk 
+   is preceded by a hunk header specifying the old and new line 
+   numbers where the hunk occurs.
+
+	vc-diff (C-x v =)
+	Compares work files in the current version control (VC) fileset 
+	with the previous versions that you started from. It displays a 
+	diff for the comparison in another window, in a diff mode buffer
+	called *vc-diff*
+
+	vc-revert (C-x v u)
+	Reverts work files in the current VC fileset to the last revision.
+	This shows a "diff between the work files and the revision from 
+	which you started editing"
+
+	diff-apply-hunk (C-c C-a)
+	Applies this hunk to its target file. If prefixed with C-u, it 
+	will revert this hunk.
+
+	diff-goto-source (C-c C-c)
+	Goes to the source file and line corresponding to this hunk.
+
+9. Use Emacs to revert all the changes to files other than .c files.
+ALSO, undo all changes to .c files other than changes to character 
+string constants (may require editing files by hand)
+
+	To begin, revert changes to all non-.c files using emacs. These 
+	are:
+	   	NEWS
+	   	README
+	   	TODO
+	   	doc/diagmeet.note
+	   	ms/config.bat
+	   	ms/config.site
+	   	po/en.po
+	   	src/diff.h
+	   	src/system.h
+	   	tests/help-version
+	All of these were reverted using vc-revert (C-x v u).
+
+	The following .c files had the hunks reverted at line numbers
+		Files:				Line #
+		src/analyze.c 		All hunks
+		src/cmp.c 			36, 364, 377
+		src/context.c 		All hunks
+		src/diff.c 			40, 57, 92
+		src/diff3.c 		35, 159, 1475
+		src/dir.c 			84, 125, 234
+		src/ifdef.c 		all
+		src/io.c 			all
+		src/sdiff.c 		35, 92, 747
+		src/side.c 			all
+		src/util.c 			27, 121, 146, 190, 241, 270, 650
+	I used vc-diff to check each hunk, M-n and M-p to navigate through 
+	hunks. For the hunks starting at the corresponding line numbers,
+	I used (C-u C-c C-a) to rever those hunks.
+
+10. Use Emacs to examine the files src/*.c.rej and copy rejected 
+	patches as needed
+
+	The two .c files we need to look at are src/diff3.c and src/diff.c
+	I used Emacs to open the .rej files and C-c C-c to compare hunks to
+	the source.
+
+	For src/diff3.c:
+		Manually applied changes here.
+
+	For src/diff.c
+		Manually applied changes here.
+
+11. Remove untracked files 
+
+	$ git clean -f
+
+12. Create a patch using git diff into quote-3.0-patch.txt
+
+	$ git status
+	On branch local3.0
+	Changes to be committed:
+	  (use "git reset HEAD <file>..." to unstage)
+
+		modified:   src/cmp.c
+		modified:   src/diff.c
+		modified:   src/diff3.c
+		modified:   src/dir.c
+		modified:   src/sdiff.c
+		modified:   src/util.c
+
+	$ git diff > ../quote-3.0-patch.txt
+
+13. Build the modified version of diffutils using instructions defined 
+in README-hacking. Needed to apply the patch specified in the lab spec
+because gets is used in a diffutils header
+	$ ./bootstrap
+	$ patch -p1 < ../diffutils-gets.diff
+	$ ./configure
+	$ make
+	$ make check
+
+Verify the patched version behaves correctly
+	$ ./src/diff . -
+	diff: cannot compare '-' to a directory
+	$ ./src/diff --help
+
+	Both of these use the apostrophe instead of `
+
+14. Sanity test. Compare the source of Diffutils 3.0 to my modified 
+version
+
+	First, need to get the source of Diffutils 3.0
+	$ mv diffutils diffutils-patched
+	$ git clone ~eggert/src/gnu/diffutils
+	$ mv diffutils diffutils-orig
+	$ cd diffutils-orig
+	$ git checkout v3.0
+	$ cd ..
+
+	Then, copy the sources of each version into new directories
+	$ mkdir diffutils-3.0
+	$ mkdir diffutils-3.0-patch
+	$ cp diffutils-orig/src/*.c diffutils-3.0/
+	$ cp diffutils-patched/src/*.c diffutils-3.0-patch/
+
+	Compare using the provided command
+	$ ./diffutils-patched/src/diff -pru diffutils-3.0 diffutils-3.0-patch > quote-3.0-test.txt
+
+	Looking at the output, it looks like quote-3.0-test.txt shows
+	that the patched version correctly patches only instances where
+	the ` character appears, and nothing else.
+
+15. Compare the contents of quote-3.0-test.txt and quote-3.0-patch.txt
+	$ diff quote-3.0-test.txt quote-3.0-patch.txt
+
+	The files are not identical, but it seems as though the differences
+	are innocuous. They were mostly related to file paths or places
+	where lines did not match up properly.

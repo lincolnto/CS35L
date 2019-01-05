@@ -1,0 +1,31 @@
+/*
+ *  Lincoln To
+ *  104 441 725
+ *  Assignment 8
+ *  CS 35L Lab 5
+ */
+
+1. The resulting network is still secure as it uses public-key (asymmetric) encryption.
+Because this method of encryption is used, other teams would be able to view the encrypted
+bytes going across the network, but would be unable to decrypt those bytes as they do not
+have access to our private keys.
+
+(1) The network would still be secure if all client-server setup is completed and ssh-agent
+is utilized to manage passphrases for the private key. If this is done properly, tapping 
+the keyboards would still not allow other teams to access the passphrase in order to
+access the private key.
+
+(2) The network would not be secure if booting off of USB, as other teams would have access
+to all files in the root, and could easily copy the keys from the .ssh folder within the
+bootable USB.
+
+2. gpg2 --verify simply verifies that the file and the detached signatures match, using
+public keys to do so. Because of this, you can simply modify the data in the target file,
+and then send along your own public key rather than the original key, and gpg2 --verify 
+will still confirm that the signature is good.
+
+The alternative is to sign the file using your own private key, which only you should have
+access to. If the sender signs the file with their private key, others can verify the file
+using the sender's public key. This verification will only work if the file has not been
+modified, and others cannot tamper with this because they do not have access to the 
+sender's private key, meaning they cannot re-sign the file if they tamper with the data.

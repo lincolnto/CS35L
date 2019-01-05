@@ -1,0 +1,121 @@
+##########################
+##		Lincoln To		##
+##		104 441 725		##
+##		CS35L Lab 5		##
+##########################
+
+1. 
+Set locale to standard C locale
+$ export LC_ALL='C'
+$ locale
+
+2. 
+Sort the words file 
+$ sort -u /usr/share/dict/words > ./words
+
+3. 
+Download assignment page
+$ curl https://web.cs.ucla.edu/classes/fall18/cs35L/assign/assign2.html > ./assign2.html
+
+4. 
+Describe outputs of various tr commands
+$ man tr
+Before starting, I looked through the manual for tr to get an idea of what the command does. The command translates or deletes characters. The -c option uses the complement of SET1, while the -s character replaces each input sequence of a repeated character that is listed in SET1 with a single occurrence of that character.
+
+$ cat assign2.html | tr -c 'A-Za-z' '[\n*]' 
+This command replaces every non-letter character (i.e. not A-Z or a-z) with a newline character, outputting this to standard output.
+
+$ cat assign2.html | tr -cs 'A-Za-z' '[\n*]' 
+This command does the same thing, but does not have repeated newlines between each word.
+
+$ cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort
+This command differs from the previous one in that it sorts all the words into alphabetical order
+
+$ cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort -u
+This command differs from the previous one in that it removes all repeated words
+
+$ cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm - words
+This outputs all lines from the output of the previous command as well as all lines in the file words.
+
+$ cat assign2.html | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words
+This outputs words unique to assign2.html.
+
+5.
+Get the Hawaiian words page
+$ wget http://mauimapp.com/moolelo/hwnwdseng.htm > hwnwdseng.htm
+
+6.
+Completed Script:
+#!/bin/bash                                               
+                                                          
+# Remove text before and after table                      
+sed '/<!DOCTYPE/,/<\/font><\/td>/d' |                     
+sed '/<\/table>/,/<\/html>/d' |                           
+                                                          
+# Remove English word entries                             
+sed '/<tr>/,/<\/td>/d' |                                  
+                                                          
+# Set all characters to lower                             
+tr '[:upper:]' '[:lower:]' |                              
+                                                          
+# Replace ` with '                                        
+sed s/\`/\'/g |                                           
+                                                          
+# Fix underlined characters                               
+sed 's/<u>a<\/u>/a/g' |                                   
+sed 's/<u>e<\/u>/e/g' |                                   
+sed 's/<u>i<\/u>/i/g' |                                   
+sed 's/<u>o<\/u>/o/g' |                                   
+sed 's/<u>u<\/u>/u/g' |                                   
+                                                          
+# Cleanup: Remove Carriage returns                        
+tr -d '\r\n' |                                            
+                                                          
+# Cleanup: Remove closing </td> tags, replace with newline
+sed 's/<\/td>/\n/g' |                                     
+                                                          
+# Cleanup: Remove commas, replace with newline            
+sed 's/\,/\n/g' |                                         
+                                                          
+# Cleanup: Remove leftover HTML tags                      
+sed 's/<[^>]*>//g' |                                      
+                                                          
+# Cleanup: Replace spaces with newline                    
+sed 's/ /\n/g' |                                          
+                                                          
+# Cleanup: Remove extra spaces                            
+tr -d '[:blank:]' |                                       
+                                                          
+# Delete any words containing a -                         
+sed '/-/d' |                                              
+                                                          
+# Spellchecking                                           
+tr -cs "pk\'mnwlhaeiou<" '[\n*]' |                        
+                                                          
+# Sort and remove duplicates                              
+sort -u |                                                 
+                                                          
+# Remove leftover empty lines                             
+sed '/^$/d'                                               
+
+8.
+Make script executable
+$ chmod +x buildwords
+
+9. 
+Run script
+$ cat hwnwdseng.htm | ./buildwords > hwords
+
+10.
+Do spellchecking
+a. English:
+$ cat assign2.html | tr '[:upper:]' '[:lower:]' | tr -cs 'A-Za-z' '[\n*]' | sort -u | comm -23 - words > engSpellCheck
+
+$ wc -w engSpellCheck
+This gives 38 misspellled words.
+
+b. Hawaiian:
+$ cat assign2.html | tr '[:upper:]' '[:lower:]' | tr -cs "pk\'mnwlhaeiou" '[\n*]' | sort -u | comm -23 - hwords > hwnSpellCheck
+
+$ wc -w hwnSpellCheck
+This gives 196 misspelled words.

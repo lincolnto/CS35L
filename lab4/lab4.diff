@@ -1,0 +1,19 @@
+2018-11-04  Lincoln To  <lincoln@lnxsrv06.seas.ucla.edu>
+
+	* timespec.h (timespec_cmp):
+	Fixes issues where ls -lt will improperly order files with extremely
+	old dates.
+
+--- /lib/timespec.h	2005-09-21 23:05:39.000000000 -0700
++++ /lib/timespec.h	2018-11-04 01:13:09.298043000 -0800
+@@ -45,8 +45,8 @@
+ static inline int
+ timespec_cmp (struct timespec a, struct timespec b)
+ {
+-  int diff = a.tv_sec - b.tv_sec;
+-  return diff ? diff : a.tv_nsec - b.tv_nsec;
++  return a.tv_sec > b.tv_sec ? 1 : (a.tv_sec < b.tv_sec ?
++				    -1 : a.tv_nsec - b.tv_nsec);
+ }
+ 
+ # if ! HAVE_DECL_NANOSLEEP

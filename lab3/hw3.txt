@@ -1,0 +1,44 @@
+Q1. Does the patch improve the performance of ls or make it worse? Briefly
+explain.
+
+The patch removes the conditional statement "if (ignore_mode ==
+IGNORE_DEFAULT)"and does not make any other significant changes, so it
+should improve the performance of ls. I tested this by installing
+coreutils-8.29 (without the patch) in another directory, and ran the
+command "$ time ./ls -aA" in both directories. The patched version gave an
+output of: real	0m0.003s
+	user	0m0.000s
+	sys	0m0.002s
+while the unpatched version gave an output of:
+	real	0m0.005s
+	user	0m0.000s
+	sys	0m0.003s
+indicating that the patch likely improved performance.
+
+Q2. If your company adopts this patched version of Coreutils instead of the
+default one, what else should you watch out for? Might this new version of
+Coreutils introduce other problems with your application?
+
+Because the fix was relatively straightforward and involved removing a single
+conditional in the ls.c source, it is unlikely that there is anything major to
+watch out for. If there are applications which took utilized the la script
+mentioned in the spec, they may need to be revised in order to confirm that 
+they operate with the expected behavior (i.e. the latter flag will override the
+former in the case of -aA or -Aa)
+
+Q3. What happens when this script is invoked on an empty file like /dev/null,
+and why?
+
+The script returns an error IndexError: list index out of range. This is 
+because the random.choice() function takes in the lines read from the file as 
+an argument. If this argument is empty (i.e. in the case of reading in an 
+empty file), the function will return an error.
+
+Q4. What happens when this script is invoked with Python 3 rather than Python
+2, and why? (You can run Python 3 on the SEASnet hosts by using the command
+python3 instead of python.)
+
+The script will not run and will return "SyntaxError: invalid syntax" for the
+line "except IOError as (errno, strerror):". When checking the Python3
+documentation, we see that IOError has been merged into OSError, so the line
+needs to be modified for it to work in Python3.
